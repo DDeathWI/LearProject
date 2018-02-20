@@ -1,13 +1,13 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
+using UnityEngine.SceneManagement;
 
-public static class Test {
+public class Test : MonoBehaviour {
 
-    public static void ResetTrans(this Transform t) {
+    void Start() { 
 
-        t.position = Vector3.zero;
+        PlayerPrefs.SetInt("health", 100);
 
+        SceneManager.LoadScene("Scene2", LoadSceneMode.Single);
     }
 	
 	
