@@ -17,7 +17,9 @@ public class TileScript : MonoBehaviour {
     {
         CharacterControll.SetDestination(transform.position);
 
-        spriteRenderer.color = Color.blue;
+        //spriteRenderer.color = Color.blue;
+
+
     }
         
     //private void OnMouseEnter()

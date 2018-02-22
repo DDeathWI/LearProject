@@ -7,22 +7,47 @@ public class CharacterControll : MonoBehaviour {
 
     private IEnumerator moveAction;
 
-    private static Vector3 destination;
+    private AttemptToMove attemptToMove;
 
-    Vector2[] moves = new Vector2[] {
-        new Vector2(-1,0),
-        new Vector2( 1,0),
-        new Vector2(0, 1),
-        new Vector2(0,-1)};
+    [SerializeField]
+    private FindWayAlgo wayAlgo;
 
-    public List<Way> waysList;
+    public static Vector3 destination;
+
+    public static bool s;
+
+    public static List<Vector2> moves;
+
+    public static bool search = false;
+
+    IEnumerator LongMove() {
+        Debug.Log("StartLongMove");
+
+        moveAction = LongMove();
+
+        for (int i = 0; i < moves.Count; i++)
+        {
+            //Debug.Log(transform.position);
+            transform.position = new Vector3(moves[i].x, moves[i].y, transform.position.z);
+            destination = transform.position;
+
+            yield return new WaitForSeconds(0.15f);
+        }
+
+        wayAlgo.Clear();
+        moves = null;
+        moveAction = null;
+        search = false;
+
+    }
 
     IEnumerator WaitingAction(Vector2 move)
     {
-        if (CheckMoveAttempt(move))
+        if (attemptToMove.Result(transform.position, move))
         {
-            Vector3 destination = transform.position + new Vector3(move.x, move.y, 0);
-            transform.position = destination;
+            Vector3 _destination = transform.position + new Vector3(move.x, move.y, 0);
+            transform.position = _destination;
+            destination = _destination;
         }
         yield return new WaitForSeconds(0.1f);
         StopCoroutine(moveAction);
@@ -33,17 +58,44 @@ public class CharacterControll : MonoBehaviour {
     {
         destination = transform.position;
 
-        waysList = new List<Way>(); 
+        wayAlgo = new FindWayAlgo();
+
+        attemptToMove = new AttemptToMove();
+
+        Camera.main.transform.position = transform.position + new Vector3(-3.5f, -3, -6);
+        Camera.main.transform.parent = transform;
     }
 
     private void Update()
     {
+        // In Move
         if (moveAction != null)
             return;
 
-        if (destination != transform.position)
+        if (moves != null)
         {
-            FindWay();    
+            StartCoroutine(LongMove());
+        }
+
+        if (s) {
+            search = false;
+            s = false;
+            destination = transform.position;
+        }
+
+        //In Search Way
+        if (search)
+        {
+            return;
+        }
+
+        Debug.Log("ready");
+
+        //Destination Was Chanched
+        if (destination != transform.position && !search)
+        {
+            wayAlgo.FindWay(transform.position, destination);
+            search = true;
         }
 
         if (Input.GetKey(KeyCode.A)) {
@@ -70,69 +122,14 @@ public class CharacterControll : MonoBehaviour {
             StartCoroutine(moveAction);
         }
     }
-
-    private bool CheckMoveAttempt(Vector2 move) {
-
-        RaycastHit2D hit = Physics2D.Raycast((new Vector2(transform.position.x, transform.position.y) + move/1.9f), move, 0.5f);
-        if (hit.collider != null)
-        {
-            return 8 != hit.collider.gameObject.layer && 9 != hit.collider.gameObject.layer;
-        }
-        return true;
-
-    }
-
-    private bool CheckMoveAttempt(Vector3 position, Vector2 move)
-    {
-
-        RaycastHit2D hit = Physics2D.Raycast((new Vector2(position.x, position.y) + move / 1.9f), move, 0.5f);
-        if (hit.collider != null)
-        {
-            return 8 != hit.collider.gameObject.layer && 9 != hit.collider.gameObject.layer;
-        }
-        return true;
-
-    }
-
+    
     public static void SetDestination(Vector3 vector)
     {
         destination = vector;
     }
 
-    private void FindWay()
+    public static void SetSearch(bool value)
     {
-        //if (waysList.Count == 0)
-        //{
-        //    for (int move = 0; move < moves.Length; move++)
-        //    {
-        //        if (CheckMoveAttempt(moves[move]))
-        //        {
-        //            Way _way = new Way(1, ) 
-        //        }
-        //    }
-        //}
-
-        for (int move = 0; move < moves.Length; move++)
-        {
-            foreach (Way _way in waysList)
-            {   
-                if (CheckMoveAttempt(_way.points[_way.points.Count-1], moves[move]))
-                {
-                    Debug.Log("!");
-                }
-            }
-        }
-    }
-
-    [Serializable]
-    public struct Way {
-        public int length;
-        public List<Vector2> points;
-
-        public Way(int _length, Vector3 position) {
-            length = _length;
-            points = new List<Vector2>();
-            points.Add(position);
-        }
+        search = value;
     }
 }
