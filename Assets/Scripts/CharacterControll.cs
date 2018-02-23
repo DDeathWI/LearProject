@@ -20,15 +20,29 @@ public class CharacterControll : MonoBehaviour {
 
     public static bool search = false;
 
+    private float timeCounter;
+
     IEnumerator LongMove() {
-        Debug.Log("StartLongMove");
+        Debug.Log("StartLongMove. Time: " + (Time.realtimeSinceStartup - timeCounter) + "Lenght "+ moves.Count);
 
         moveAction = LongMove();
 
+        RaycastHit2D hit =
+              Physics2D.Raycast(new Vector2(transform.position.x, transform.position.y),
+              new Vector2(transform.position.x, transform.position.y), 0.5f);// + moves[i] / 1.9f), moves[i], 0.5f);
+
+        hit.transform.GetComponent<SpriteRenderer>().color = UnityEngine.Random.ColorHSV();
+
         for (int i = 0; i < moves.Count; i++)
         {
-            //Debug.Log(transform.position);
+
             transform.position = new Vector3(moves[i].x, moves[i].y, transform.position.z);
+
+            hit =
+                Physics2D.Raycast(new Vector2(transform.position.x, transform.position.y), moves[i], 0.5f);// + moves[i] / 1.9f), moves[i], 0.5f);
+
+            hit.transform.GetComponent<SpriteRenderer>().color = UnityEngine.Random.ColorHSV();
+
             destination = transform.position;
 
             yield return new WaitForSeconds(0.15f);
@@ -62,8 +76,8 @@ public class CharacterControll : MonoBehaviour {
 
         attemptToMove = new AttemptToMove();
 
-        Camera.main.transform.position = transform.position + new Vector3(-3.5f, -3, -6);
-        Camera.main.transform.parent = transform;
+        //Camera.main.transform.position = transform.position + new Vector3(-3.5f, -3, -6);
+        //Camera.main.transform.parent = transform;
     }
 
     private void Update()
@@ -74,7 +88,8 @@ public class CharacterControll : MonoBehaviour {
 
         if (moves != null)
         {
-            StartCoroutine(LongMove());
+            moveAction = LongMove();
+            StartCoroutine(moveAction);
         }
 
         if (s) {
@@ -89,12 +104,11 @@ public class CharacterControll : MonoBehaviour {
             return;
         }
 
-        Debug.Log("ready");
-
         //Destination Was Chanched
-        if (destination != transform.position && !search)
+        if ((Vector2)destination != (Vector2)transform.position && !search)
         {
-            wayAlgo.FindWay(transform.position, destination);
+            timeCounter = Time.realtimeSinceStartup; 
+            StartCoroutine (wayAlgo.FindWay(transform.position, destination));
             search = true;
         }
 
@@ -132,4 +146,11 @@ public class CharacterControll : MonoBehaviour {
     {
         search = value;
     }
+
+    private void OnDestroy()
+    {
+        destination = transform.position;
+    }
+
+
 }

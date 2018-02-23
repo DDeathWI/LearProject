@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+
 
 public class MapGeneration : MonoBehaviour {
 
@@ -30,13 +32,16 @@ public class MapGeneration : MonoBehaviour {
     [SerializeField]
     private int WaterChance = 10;
 
-
     private List<Vector3> MapList = new List<Vector3>();
 
     private Transform boardHolder;
 
+    private Transform heroPosition;
+
     private void Start()
     {
+        DynamicGI.UpdateEnvironment();
+
         //Set Camera Position
         //SetCameraPosition();
 
@@ -85,14 +90,28 @@ public class MapGeneration : MonoBehaviour {
         }
     }
     
-
     void SetHero()
     {
-        Transform heroPosition = Instantiate(Character, new Vector3(0, 0, -0.5f), Quaternion.Euler(0,0,0)).transform;
+        heroPosition = Instantiate(Character, new Vector3(0, 0, -0.5f), Quaternion.Euler(0,0,0)).transform;
 
         //transform.parent = heroPosition;
 
-
     }
 
+    public void Reload() {
+
+        //CharacterControll.SetDestination(heroPosition.position);
+        //StopAllCoroutines();
+
+        //CharacterControll cc = heroPosition.GetComponent<CharacterControll>();
+        //cc.enabled = false;
+
+
+        SceneManager.LoadScene("Scene", LoadSceneMode.Single);
+    }
+
+    private void Update()
+    {
+        transform.LookAt(heroPosition, new Vector3(0,0,-1));
+    }
 }

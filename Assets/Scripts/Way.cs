@@ -18,6 +18,9 @@ public class Way
     public Vector3 startPosition;
 
     public Vector3 lastPosition;
+
+    public Vector2 lastMove;
+
     public List<Vector2> points;
 
     public Way(Vector3 position)
@@ -27,6 +30,8 @@ public class Way
 
         startPosition = position;
         lastPosition = startPosition;
+
+        lastMove = new Vector2(0, 0);
 
         points = new List<Vector2> {
             //position
@@ -40,6 +45,8 @@ public class Way
         lenght = _way.lenght;
         startPosition = _way.startPosition;
         lastPosition = _way.lastPosition;
+
+        lastMove = move;
 
         points = new List<Vector2>();
         for (int index = 0; index < _way.points.Count; index++)

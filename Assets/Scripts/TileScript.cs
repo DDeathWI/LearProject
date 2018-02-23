@@ -17,11 +17,13 @@ public class TileScript : MonoBehaviour {
     {
         CharacterControll.SetDestination(transform.position);
 
+        //spriteRenderer.color = /*Random.ColorHSV();*/
+
         //spriteRenderer.color = Color.blue;
 
 
     }
-        
+
     //private void OnMouseEnter()
     //{
     //    if (Input.GetMouseButton(0))
