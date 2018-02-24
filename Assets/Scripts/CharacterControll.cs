@@ -22,6 +22,11 @@ public class CharacterControll : MonoBehaviour {
 
     private float timeCounter;
 
+    [SerializeField]
+    private AudioClip[] StepSound;
+
+    private AudioSource audioSource;
+
     IEnumerator LongMove() {
         Debug.Log("StartLongMove. Time: " + (Time.realtimeSinceStartup - timeCounter) + "Lenght "+ moves.Count);
 
@@ -35,7 +40,9 @@ public class CharacterControll : MonoBehaviour {
 
         for (int i = 0; i < moves.Count; i++)
         {
-
+            audioSource.Stop();
+            audioSource.clip = StepSound[0];
+            audioSource.Play();
             transform.position = new Vector3(moves[i].x, moves[i].y, transform.position.z);
 
             hit =
@@ -70,6 +77,7 @@ public class CharacterControll : MonoBehaviour {
 
     private void Awake()
     {
+        audioSource = GetComponent<AudioSource>();
         destination = transform.position;
 
         wayAlgo = new FindWayAlgo();
