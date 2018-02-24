@@ -13,10 +13,10 @@ public class FindWayAlgo
 
     private Vector2[] moves = new Vector2[] {
 
-        new Vector2(0, 1),
-        new Vector2(0, -1),
-        new Vector2(-1, 0),
-        new Vector2(1, 0)
+        new Vector2(1, 0),
+                    new Vector2(-1, 0),
+                    new Vector2(0, 1),
+                    new Vector2(0, -1)
     };
 
 
@@ -59,6 +59,21 @@ public class FindWayAlgo
 
         for (int index = 0; index < wayList.Count; index++)
         {
+
+            bool status = wayList[index].lastPosition.x == destination.x && wayList[index].lastPosition.y == destination.y;
+            //yield return status;
+            if (status)
+            {
+                //wayList.RemoveAll(x => x.lastPosition != destination);
+
+                CharacterControll.moves = wayList.Find(x => x.lastPosition == destination).points;
+
+                CharacterControll.search = false;
+                NoWay = false;
+
+                break;
+            }
+
             if (wayList[index].lastMove.x == 0)
             {
                 moves = new Vector2[]{
@@ -97,29 +112,19 @@ public class FindWayAlgo
                         continue;
                     }
 
-                    if (wayList.Exists(x => x.points.Exists(y => y == vector2) && x.lenght <= wayList[index].lenght))
-                    {
-                        continue;
-                    }
+                    //if (wayList.Exists(x => x.points.Exists(y => y == vector2) && x.lenght <= wayList[index].lenght))
+                    //{
+                    //    continue;
+                    //}
 
                     wayList.Add(new Way(moves[move], wayList[index]));
                 }
+
                 
+
             }
 
-            
-
-            if (wayList[index].lastPosition.x == destination.x && wayList[index].lastPosition.y == destination.y)
-            {
-                //wayList.RemoveAll(x => x.lastPosition != destination);
-
-                CharacterControll.moves = wayList.Find(x => x.lastPosition == destination).points;
-
-                CharacterControll.search = false;
-                NoWay = false;
-
-                break;
-            }
+           
 
             //wayList.RemoveAt(index);
             //index--;

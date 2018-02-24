@@ -48,7 +48,7 @@ public class CharacterControll : MonoBehaviour {
             yield return new WaitForSeconds(0.15f);
         }
 
-        wayAlgo.Clear();
+        //wayAlgo.Clear();
         moves = null;
         moveAction = null;
         search = false;

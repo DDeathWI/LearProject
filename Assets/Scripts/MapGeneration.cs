@@ -92,7 +92,7 @@ public class MapGeneration : MonoBehaviour {
     
     void SetHero()
     {
-        heroPosition = Instantiate(Character, new Vector3(0, 0, -0.5f), Quaternion.Euler(0,0,0)).transform;
+        heroPosition = Instantiate(Character, new Vector3(1, 1, -0.5f), Quaternion.Euler(0,0,0)).transform;
 
         //transform.parent = heroPosition;
 
