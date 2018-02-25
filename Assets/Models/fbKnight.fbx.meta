@@ -17,7 +17,7 @@ ModelImporter:
       name: fbKnight_material
     second: {fileID: 2100000, guid: f05902f6ea4a44654b2f50a553e1485a, type: 2}
   materials:
-    importMaterials: 1
+    importMaterials: 0
     materialName: 0
     materialSearch: 1
     materialLocation: 0

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-
+using UnityEngine.UI;
 
 public class MapGeneration : MonoBehaviour {
 
@@ -38,8 +38,20 @@ public class MapGeneration : MonoBehaviour {
 
     private Transform heroPosition;
 
+    //
+    public Text widthLabel;
+    public Text heightLabel;
+    public Text waterLabel;
+
+
     private void Start()
     {
+        if (PlayerPrefs.GetInt("Width") != 0)
+        {
+            width = PlayerPrefs.GetInt("Width");
+            height = PlayerPrefs.GetInt("Height");
+            WaterChance = PlayerPrefs.GetInt("Water");
+        }
         DynamicGI.UpdateEnvironment();
 
         //Set Camera Position
@@ -92,9 +104,10 @@ public class MapGeneration : MonoBehaviour {
     
     void SetHero()
     {
-        heroPosition = Instantiate(Character, new Vector3(1, 1, -0.5f), Quaternion.Euler(0,0,0)).transform;
+        heroPosition = Instantiate(Character, new Vector3(0, 0, -0.5f), Quaternion.Euler(0,0,0)).transform;
+        transform.position = heroPosition.position + new Vector3(-3.5f, -3.5f, -3.5f);
 
-        //transform.parent = heroPosition;
+        transform.parent = heroPosition;
 
     }
 
@@ -106,12 +119,52 @@ public class MapGeneration : MonoBehaviour {
         //CharacterControll cc = heroPosition.GetComponent<CharacterControll>();
         //cc.enabled = false;
 
+        PlayerPrefs.SetInt("Width", width);
+        PlayerPrefs.SetInt("Height", height);
+        PlayerPrefs.SetInt("Water", WaterChance);
 
         SceneManager.LoadScene("Scene", LoadSceneMode.Single);
     }
 
+    Vector3 startPos;
+
     private void Update()
     {
-        transform.LookAt(heroPosition, new Vector3(0,0,-1));
+        waterLabel.text = WaterChance.ToString();
+        widthLabel.text = width.ToString();
+        heightLabel.text = height.ToString();
+
+        //transform.LookAt(heroPosition, Vector3.back);
+        if (Input.GetMouseButtonDown(0))
+            startPos = Input.mousePosition;
+
+        if (Input.GetMouseButton(0))
+        {
+            transform.RotateAround(heroPosition.position, Vector3.back, (Input.mousePosition.x - startPos.x));
+            startPos = Input.mousePosition;
+        }
+
+        if (Input.mouseScrollDelta.y + transform.position.z <= -0.5f && Input.mouseScrollDelta.y + transform.position.z >- 40)
+        {
+            transform.Translate(new Vector3(0, 0, Input.mouseScrollDelta.y), heroPosition);
+            transform.LookAt(heroPosition, Vector3.back);
+        }
+    }
+
+
+
+    public void ChangeWidth(bool value)
+    {
+        width += value ? 1 : -1;
+    }
+
+    public void ChangeHeight(bool value)
+    {
+        height += value ? 1 : -1;
+    }
+
+    public void ChangeWater(bool value)
+    {
+        WaterChance += value ? 1 : -1;
     }
 }

@@ -43,23 +43,42 @@ public class CharacterControll : MonoBehaviour {
             audioSource.Stop();
             audioSource.clip = StepSound[0];
             audioSource.Play();
-            transform.position = new Vector3(moves[i].x, moves[i].y, transform.position.z);
+
+            //transform.position = new Vector3(moves[i].x, moves[i].y, transform.position.z);
+
+            yield return Move(new Vector3(moves[i].x, moves[i].y, transform.position.z));
 
             hit =
                 Physics2D.Raycast(new Vector2(transform.position.x, transform.position.y), moves[i], 0.5f);// + moves[i] / 1.9f), moves[i], 0.5f);
 
             hit.transform.GetComponent<SpriteRenderer>().color = UnityEngine.Random.ColorHSV();
 
-            destination = transform.position;
 
-            yield return new WaitForSeconds(0.15f);
+
+            //yield return null;// StartCoroutine(Move(destination));
+
+
+            //yield return new WaitForSeconds(0.15f);
         }
+
+        destination = transform.position;
+
 
         //wayAlgo.Clear();
         moves = null;
         moveAction = null;
         search = false;
 
+    }
+
+    IEnumerator Move(Vector3 move)
+    {
+        for (float t = 0; t <= 1; t += 0.25f)
+        {
+            transform.position = Vector3.Lerp(transform.position, move, t);
+            yield return new WaitForFixedUpdate();
+
+        }
     }
 
     IEnumerator WaitingAction(Vector2 move)

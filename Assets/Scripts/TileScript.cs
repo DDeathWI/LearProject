@@ -1,6 +1,5 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class TileScript : MonoBehaviour {
 
@@ -13,9 +12,30 @@ public class TileScript : MonoBehaviour {
         spriteRenderer.color = Color.white;
     }
 
+
     private void OnMouseDown()
     {
-        CharacterControll.SetDestination(transform.position);
+
+        if (Input.GetMouseButton(0))
+        {
+#if UNITY_ANDROID
+        if(Input.touchCount < 2)
+            
+#endif
+
+            if (!EventSystem.current.IsPointerOverGameObject(0))
+            {
+                //do something
+                Debug.Log("Click");
+                CharacterControll.SetDestination(transform.position);
+            }
+            else
+            {
+                Debug.Log("Block Click");
+                //do something else
+            }
+
+            }
 
         //spriteRenderer.color = /*Random.ColorHSV();*/
 
