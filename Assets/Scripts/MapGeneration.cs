@@ -107,7 +107,7 @@ public class MapGeneration : MonoBehaviour {
         heroPosition = Instantiate(Character, new Vector3(0, 0, -0.5f), Quaternion.Euler(0,0,0)).transform;
         transform.position = heroPosition.position + new Vector3(-3.5f, -3.5f, -3.5f);
 
-        transform.parent = heroPosition;
+        transform.SetParent(heroPosition);
 
     }
 
@@ -128,13 +128,17 @@ public class MapGeneration : MonoBehaviour {
 
     Vector3 startPos;
 
+
+
     private void Update()
     {
+        if (Input.GetKeyDown(KeyCode.Escape))
+            Application.Quit();
+
         waterLabel.text = WaterChance.ToString();
         widthLabel.text = width.ToString();
         heightLabel.text = height.ToString();
 
-        //transform.LookAt(heroPosition, Vector3.back);
         if (Input.GetMouseButtonDown(0))
             startPos = Input.mousePosition;
 
@@ -148,6 +152,14 @@ public class MapGeneration : MonoBehaviour {
         {
             transform.Translate(new Vector3(0, 0, Input.mouseScrollDelta.y), heroPosition);
             transform.LookAt(heroPosition, Vector3.back);
+        }
+    }
+
+    private void OnApplicationPause(bool pause)
+    {
+        if (pause)
+        {
+            System.Diagnostics.Process.GetCurrentProcess().Kill();
         }
     }
 

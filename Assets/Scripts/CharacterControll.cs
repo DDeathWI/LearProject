@@ -97,6 +97,8 @@ public class CharacterControll : MonoBehaviour {
     private void Awake()
     {
         audioSource = GetComponent<AudioSource>();
+        audioSource.volume = 0.5f;
+
         destination = transform.position;
 
         wayAlgo = new FindWayAlgo();
