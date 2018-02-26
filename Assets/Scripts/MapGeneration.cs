@@ -16,8 +16,6 @@ public class MapGeneration : MonoBehaviour {
     [SerializeField]
     private GameObject Wall;
 
-
-
     [Space(5)]
     [Header("Set Character Prefab")]
 
@@ -28,9 +26,8 @@ public class MapGeneration : MonoBehaviour {
     private int width = 8;
     [SerializeField]
     private int height = 8;
-
     [SerializeField]
-    private int WaterChance = 10;
+    private int waterChance = 10;
 
     private List<Vector3> MapList = new List<Vector3>();
 
@@ -38,24 +35,29 @@ public class MapGeneration : MonoBehaviour {
 
     private Transform heroPosition;
 
-    //
-    public Text widthLabel;
-    public Text heightLabel;
-    public Text waterLabel;
+    [SerializeField]
+    private Text widthLabel;
+    [SerializeField]
+    private Text heightLabel;
+    [SerializeField]
+    private Text waterLabel;
 
 
     private void Start()
     {
+        AListener.instance.current = AListener.Action.Idle;
+
+
+        //Get Map Si2e and waterChance
         if (PlayerPrefs.GetInt("Width") != 0)
         {
             width = PlayerPrefs.GetInt("Width");
             height = PlayerPrefs.GetInt("Height");
-            WaterChance = PlayerPrefs.GetInt("Water");
+            waterChance = PlayerPrefs.GetInt("Water");
         }
-        DynamicGI.UpdateEnvironment();
 
-        //Set Camera Position
-        //SetCameraPosition();
+        //Update Light after Reboot
+        DynamicGI.UpdateEnvironment();
 
         //Map Generation
         MapInit();
@@ -63,13 +65,8 @@ public class MapGeneration : MonoBehaviour {
         //Set Hero
         SetHero();
     }
-
-    void SetCameraPosition()
-    {
-        transform.position = new Vector3(width / 2, height / 2, -10);
-    }
-
-    void MapInit()
+    
+    private void MapInit()
     {
         boardHolder = new GameObject("Board").transform;
 
@@ -79,79 +76,96 @@ public class MapGeneration : MonoBehaviour {
         {
             for (int j = -1; j <= height; j++)
             {
-                
-
+                // Default set Ground
                 GameObject toInstantiate = Ground;
 
-                if (WaterChance > Random.Range(0, 100))
+                // Look if water
+                if (waterChance > Random.Range(0, 100))
                 {
                     toInstantiate = Water;
                 }
 
-                //Generate Walls
+                // Generate Walls
                 if ( i== -1 || j == -1 || i == width|| j == height)
                 {
-                    toInstantiate = Wall;// Instantiate(Wall, new Vector3(i, j, 0), Quaternion.identity, WallsParent);
+                    toInstantiate = Wall;
                 }
 
-                
-
+                // Set Tile
                 Instantiate(toInstantiate, new Vector3(i, j, 0f), Quaternion.identity, boardHolder);
-
             }
         }
     }
     
     void SetHero()
     {
+        //Set Hero Position
         heroPosition = Instantiate(Character, new Vector3(0, 0, -0.5f), Quaternion.Euler(0,0,0)).transform;
-        transform.position = heroPosition.position + new Vector3(-3.5f, -3.5f, -3.5f);
 
+        //SetCamera Position
+        transform.position = heroPosition.position + new Vector3(-3.5f, -3.5f, -13.5f);
+
+        //Set Camera parent hero
         transform.SetParent(heroPosition);
-
+        transform.LookAt(heroPosition, Vector3.back);
     }
 
-    public void Reload() {
-
-        //CharacterControll.SetDestination(heroPosition.position);
-        //StopAllCoroutines();
-
-        //CharacterControll cc = heroPosition.GetComponent<CharacterControll>();
-        //cc.enabled = false;
-
+    /// <summary>
+    /// Reload Scene 
+    /// </summary>
+    private void Reload() {
+        
+        //Set map si2e and waterChance
         PlayerPrefs.SetInt("Width", width);
         PlayerPrefs.SetInt("Height", height);
-        PlayerPrefs.SetInt("Water", WaterChance);
+        PlayerPrefs.SetInt("Water", waterChance);
 
+        
+        //Load Scene
         SceneManager.LoadScene("Scene", LoadSceneMode.Single);
     }
 
-    Vector3 startPos;
 
-
+    // Mouse start Position
+    private Vector3 startPos;
+    private bool mouseClick;
 
     private void Update()
     {
+        //Exit
         if (Input.GetKeyDown(KeyCode.Escape))
             Application.Quit();
 
-        waterLabel.text = WaterChance.ToString();
+        // Label TextUI map si2e & waterChance
+        waterLabel.text = waterChance.ToString();
         widthLabel.text = width.ToString();
         heightLabel.text = height.ToString();
 
-        if (Input.GetMouseButtonDown(0))
-            startPos = Input.mousePosition;
-
-        if (Input.GetMouseButton(0))
+        if (!PointerOverUIObject.IsPointerOverUIObject)
         {
-            transform.RotateAround(heroPosition.position, Vector3.back, (Input.mousePosition.x - startPos.x));
-            startPos = Input.mousePosition;
+
+            //Remember mousePosition
+            if (Input.GetMouseButtonDown(0))
+            {
+                startPos = Input.mousePosition;
+                mouseClick = true;
+            }
+
+            if (Input.GetMouseButton(0) && mouseClick)
+            {
+                transform.RotateAround(heroPosition.position, Vector3.back, (Input.mousePosition.x - startPos.x));
+                startPos = Input.mousePosition;
+            }
+
+            if (Input.mouseScrollDelta.y + transform.position.z <= -0.5f && Input.mouseScrollDelta.y + transform.position.z > -40)
+            {
+                transform.Translate(new Vector3(0, 0, Input.mouseScrollDelta.y), heroPosition);
+                transform.LookAt(heroPosition, Vector3.back);
+            }
         }
-
-        if (Input.mouseScrollDelta.y + transform.position.z <= -0.5f && Input.mouseScrollDelta.y + transform.position.z >- 40)
+        if (Input.GetMouseButtonUp(0))
         {
-            transform.Translate(new Vector3(0, 0, Input.mouseScrollDelta.y), heroPosition);
-            transform.LookAt(heroPosition, Vector3.back);
+            mouseClick = false;
         }
     }
 
@@ -177,6 +191,8 @@ public class MapGeneration : MonoBehaviour {
 
     public void ChangeWater(bool value)
     {
-        WaterChance += value ? 1 : -1;
+        waterChance += value ? 1 : -1;
     }
+
+
 }

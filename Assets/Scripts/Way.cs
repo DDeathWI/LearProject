@@ -6,11 +6,6 @@ using UnityEngine;
 public class Way
 {
     /// <summary>
-    /// Way status. If Status == false must be deleted.
-    /// </summary>
-    public bool status;
-
-    /// <summary>
     /// Way length
     /// </summary>
     public int lenght;
@@ -25,7 +20,6 @@ public class Way
 
     public Way(Vector3 position)
     {
-        status = true;
         lenght = 0;
 
         startPosition = position;
@@ -40,8 +34,6 @@ public class Way
 
     public Way(Vector2 move,  Way _way)
     {
-        status = true;
-
         lenght = _way.lenght;
         startPosition = _way.startPosition;
         lastPosition = _way.lastPosition;

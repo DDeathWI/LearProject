@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System;
 using System.Collections;
 
-[Serializable]
 public class FindWayAlgo
 {
     private AttemptToMove attemptToMove;
@@ -19,22 +18,22 @@ public class FindWayAlgo
                     new Vector2(0, -1)
     };
 
+    public bool WayFind;
+
+    public bool NoWay;
 
     public FindWayAlgo()
     {
-        //if (instance == null)
-        //{
-        //    instance = this;
-        //}
-
         attemptToMove = new AttemptToMove();
 
         wayList = new List<Way>();
+
+        WayFind = false;
+        NoWay = false;
     }
 
     public IEnumerator FindWay(Vector3 position, Vector3 destination)
     {
-
         //Add current position as Way
         wayList.Add(new Way(position));
 
@@ -55,8 +54,6 @@ public class FindWayAlgo
         // Search Way to Destination
         // Loop to end wayList 
 
-        bool NoWay = true;
-
         for (int index = 0; index < wayList.Count; index++)
         {
 
@@ -68,8 +65,7 @@ public class FindWayAlgo
 
                 CharacterControll.moves = wayList.Find(x => x.lastPosition == destination).points;
 
-                CharacterControll.search = false;
-                NoWay = false;
+                WayFind = true;
 
                 break;
             }
@@ -112,39 +108,21 @@ public class FindWayAlgo
                         continue;
                     }
 
-                    //if (wayList.Exists(x => x.points.Exists(y => y == vector2) && x.lenght <= wayList[index].lenght))
-                    //{
-                    //    continue;
-                    //}
-
                     wayList.Add(new Way(moves[move], wayList[index]));
                 }
-
-                
-
             }
-
-           
-
-            //wayList.RemoveAt(index);
-            //index--;
-           
         }
 
-
-        if (NoWay)
+        if (!WayFind)
         {
+            NoWay = true;
             Debug.Log("No Way. List: " + wayList.Count );
-
         }
         else {
             Debug.Log("List: " + wayList.Count );
         }
 
         Clear();
-        CharacterControll.search = false;
-        CharacterControll.s = true;
-
         yield return null;
     }
 
